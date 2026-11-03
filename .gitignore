@@ -1,0 +1,14 @@
+.env
+.env.*
+!.env.example
+.cache/
+.tools/
+.m2/
+**/target/
+*.log
+*.zip
+.idea/
+.vscode/
+*.iml
+.DS_Store
+Thumbs.db
