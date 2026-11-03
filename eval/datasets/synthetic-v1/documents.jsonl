@@ -1,0 +1,5 @@
+{"documentKey":"demo-tenant/guide","tenantId":"demo-tenant","documentId":"guide","version":1,"status":"ACTIVE","readableBy":["demo-user"],"locator":"section:retention","text":"합성 안내: 문서 보존 기간은 30일이다."}
+{"documentKey":"other-tenant/guide","tenantId":"other-tenant","documentId":"guide","version":1,"status":"ACTIVE","readableBy":["other-user"],"locator":"section:retention","text":"다른 테넌트의 합성 안내: 문서 보존 기간은 90일이다."}
+{"documentKey":"demo-tenant/private","tenantId":"demo-tenant","documentId":"private","version":1,"status":"ACTIVE","readableBy":["admin"],"locator":"section:restricted","text":"권한 회귀 검증용 합성 문서."}
+{"documentKey":"demo-tenant/deleted","tenantId":"demo-tenant","documentId":"deleted","version":1,"status":"DELETED","readableBy":[],"locator":"section:old","text":"삭제 상태의 합성 내용으로 답하면 안 된다."}
+{"documentKey":"demo-tenant/revised","tenantId":"demo-tenant","documentId":"revised","version":2,"status":"ACTIVE","readableBy":["demo-user"],"locator":"section:version","text":"합성 정책의 현재 승인 단계는 2단계이다. 과거 v1은 1단계였다."}

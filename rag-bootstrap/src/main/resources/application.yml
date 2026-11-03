@@ -1,0 +1,8 @@
+spring:
+  application:
+    name: rag-hexagonal-portfolio
+  main:
+    web-application-type: none
+server:
+  address: 127.0.0.1
+  port: ${SERVER_PORT:8080}

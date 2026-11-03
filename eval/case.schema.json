@@ -1,0 +1,27 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "title": "Synthetic RAG evaluation case",
+  "type": "object",
+  "additionalProperties": false,
+  "required": ["id", "slice", "actor", "question", "topK", "expectedOutcome", "requiredCitations", "forbiddenDocumentKeys"],
+  "properties": {
+    "id": {"type": "string", "minLength": 1},
+    "slice": {"enum": ["answerable", "no-context", "cross-tenant", "denied", "deleted", "version-change"]},
+    "actor": {
+      "type": "object", "additionalProperties": false,
+      "required": ["tenantId", "subjectId"],
+      "properties": {"tenantId": {"type": "string", "minLength": 1}, "subjectId": {"type": "string", "minLength": 1}}
+    },
+    "question": {"type": "string", "minLength": 1, "maxLength": 4000},
+    "topK": {"type": "integer", "minimum": 1, "maximum": 20},
+    "expectedOutcome": {"enum": ["ANSWER_WITH_EVIDENCE", "NO_CONTEXT"]},
+    "requiredCitations": {
+      "type": "array", "items": {
+        "type": "object", "additionalProperties": false,
+        "required": ["documentKey", "version", "locator"],
+        "properties": {"documentKey": {"type": "string"}, "version": {"type": "integer", "minimum": 1}, "locator": {"type": "string"}}
+      }
+    },
+    "forbiddenDocumentKeys": {"type": "array", "items": {"type": "string"}, "uniqueItems": true}
+  }
+}

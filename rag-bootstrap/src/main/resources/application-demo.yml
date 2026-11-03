@@ -1,0 +1,6 @@
+# Local fixture-only HTTP demonstration. This profile provides no authentication.
+spring:
+  main:
+    web-application-type: servlet
+server:
+  address: 127.0.0.1

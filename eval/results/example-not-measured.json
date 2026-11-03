@@ -1,0 +1,12 @@
+{
+  "status": "NOT_MEASURED",
+  "baselineId": "B0",
+  "dataset": "synthetic-v1",
+  "codeRevision": null,
+  "datasetSha256": null,
+  "indexBuildId": null,
+  "modelVersion": null,
+  "promptHash": null,
+  "metrics": {"recallAt5": null, "mrr": null, "citationPrecision": null, "faithfulness": null, "permissionLeakCount": null, "latencyP95Ms": null, "cost": null},
+  "note": "결과 형식 예시. 실행기와 외부 연동은 미구현이며 측정하지 않았음."
+}

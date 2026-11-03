@@ -1,0 +1,127 @@
+openapi: 3.1.0
+info:
+  title: RAG Portfolio Skeleton API
+  version: 0.1.0
+  description: |
+    구조 검토용 계약입니다. 현재 구현은 demo 프로필의 질문 API뿐입니다.
+    고정 demo 호출자를 사용하며 운영 인증/보안은 미구현입니다.
+    문서 변경 API는 계획 항목이며 handler/저장/색인을 구현하지 않았습니다.
+servers:
+  - url: http://127.0.0.1:8080
+    description: 명시적으로 demo 프로필을 켰을 때의 로컬 주소
+paths:
+  /api/v1/answers:
+    post:
+      operationId: askQuestion
+      summary: 고정 fixture와 mock으로 질문 계약 확인
+      x-implementation-status: demo-only
+      description: |
+        호출자는 bootstrap에서 demo-tenant/demo-user로 고정합니다.
+        클라이언트가 actor/tenant/principal을 지정하는 계약은 없습니다.
+        운영 API에서는 검증된 principal을 내부 Actor로 변환하는 adapter가 필요합니다.
+        기본 프로필에서는 이 경로를 활성화하지 않습니다.
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/AskQuestionRequest'
+            example: {question: '이 데모의 근거 문서는 무엇인가요?', topK: 5}
+      responses:
+        '200':
+          description: 현재 demo는 MOCK_ANSWER/MOCK 또는 NO_CONTEXT/NONE만 반환
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/AnswerResponse'
+        '400':
+          description: 잘못된 JSON, 빈 질문, 길이/범위 위반
+          content:
+            application/json:
+              schema: {$ref: '#/components/schemas/ErrorResponse'}
+        '501':
+          description: 미구현 어댑터를 수동 조립한 경우의 명시적 실패 계약; 정상 demo에는 연결하지 않음
+          content:
+            application/json:
+              schema: {$ref: '#/components/schemas/ErrorResponse'}
+        '502':
+          description: 생성 어댑터 실패 계약; demo 정상 흐름에서는 외부 provider 호출 없음
+          content:
+            application/json:
+              schema: {$ref: '#/components/schemas/ErrorResponse'}
+  /api/v1/documents/{documentId}:
+    parameters:
+      - name: documentId
+        in: path
+        required: true
+        schema: {type: string, minLength: 1}
+    put:
+      operationId: planDocumentChange
+      summary: 향후 문서 버전/ACL 변경 접수 자리
+      x-implementation-status: planned-not-implemented
+      description: |
+        HTTP handler가 없습니다. 문서 ID는 인증된 테넌트와 함께 식별합니다.
+        원본 저장, idempotency, 변경 이벤트, 색인 상태는 추후 구현합니다.
+        아래 202는 목표 계약이며 현재 서버가 반환하는 결과가 아닙니다.
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              required: [version, contentReference, aclRevision]
+              properties:
+                version: {type: integer, minimum: 1}
+                contentReference: {type: string, description: '향후 저장소 내부 참조; 임의 URL fetch 계약 아님'}
+                aclRevision: {type: string, minLength: 1}
+      responses:
+        '202': {description: '목표: 변경 접수. 미구현이며 색인 완료를 뜻하지 않음'}
+    delete:
+      operationId: planDocumentDeletion
+      summary: 향후 삭제/tombstone 계약 자리
+      x-implementation-status: planned-not-implemented
+      description: handler 없음. 목표는 catalog tombstone 우선 반영 후 인덱스/캐시 정리.
+      responses:
+        '202': {description: '목표: 삭제 접수. 현재 구현된 응답이 아님'}
+components:
+  schemas:
+    AskQuestionRequest:
+      type: object
+      required: [question]
+      properties:
+        question: {type: string, minLength: 1, maxLength: 4000, description: '공백만 있는 질문은 거부'}
+        topK:
+          type: [integer, 'null']
+          minimum: 1
+          maximum: 20
+          default: 5
+          description: 생략 또는 null이면 5. 소수와 문자열 등 다른 JSON 타입은 거부.
+    AnswerResponse:
+      type: object
+      required: [outcome, answer, citations, generationMode]
+      properties:
+        outcome:
+          type: string
+          enum: [MOCK_ANSWER, NO_CONTEXT, GENERATED_ANSWER]
+          description: GENERATED_ANSWER는 향후 외부 구현용이며 현재 demo에서는 반환하지 않음
+        answer: {type: string}
+        citations:
+          type: array
+          items: {$ref: '#/components/schemas/Citation'}
+        generationMode:
+          type: string
+          enum: [MOCK, NONE, EXTERNAL]
+          description: EXTERNAL은 향후 계약; 현재 외부 어댑터는 미구현 예외만 반환
+    Citation:
+      type: object
+      required: [documentId, version, locator]
+      properties:
+        documentId: {type: string}
+        version: {type: integer, minimum: 1}
+        locator: {type: string, description: '근거 위치, 예: page:1 또는 section:2'}
+    ErrorResponse:
+      type: object
+      required: [code, message]
+      properties:
+        code: {type: string, enum: [INVALID_REQUEST, ADAPTER_NOT_IMPLEMENTED, GENERATION_FAILED]}
+        message: {type: string, description: '원문/키/내부 스택을 포함하지 않는 메시지'}
